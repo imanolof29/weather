@@ -8,6 +8,8 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    private var weatherViewModel: WeatherViewModel!
 
     lazy var cityLabel: UILabel = {
         let city = UILabel()
@@ -44,13 +46,22 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         setUpViews()
         setUpConstraints()
-        configure()
+        callToViewModelForUIUpdate()
+    }
+    
+    private func callToViewModelForUIUpdate() {
+        self.weatherViewModel = WeatherViewModel()
+        self.weatherViewModel.bindWeatherViewModelToController = {
+            self.configure()
+        }
     }
     
     private func configure() {
-        cityLabel.text = "Irun"
-        temperatureLabel.text = "20ºC"
-        descriptionLabel.text = "Parcialmente nublado"
+        DispatchQueue.main.async {
+            self.cityLabel.text = self.weatherViewModel.weatherData.name
+            self.temperatureLabel.text = "\(Int(self.weatherViewModel.weatherData.main.temp)) K"
+            self.descriptionLabel.text = self.weatherViewModel.weatherData.weather[0].description
+        }
     }
     
     private func setUpViews() {
